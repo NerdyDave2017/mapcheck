@@ -1,5 +1,6 @@
 import {Types, Schema, Document, model, Model} from "mongoose";
 import bcrypt from "bcrypt";
+import { IUserInput,IChangePassword,IUserSignin, IUserCreate, IUpdateUser  } from "../../interfaces/user";
 
 interface IUser extends Document{
   firstname: string;
@@ -9,13 +10,7 @@ interface IUser extends Document{
   markers?: Types.ObjectId[];
 }
 
-interface IUpdateUser {
-  firstname?: string;
-  lastname?: string;
-  email?: string;
-  password?: string;
-}
-
+interface IUserDocument extends IUser{}
 
 
 
@@ -41,25 +36,24 @@ UserSchema.pre("save", async function (next) {
 });
 
 // UserSchema.methods.matchPassword = async function(enteredPassword : string) {
-//   return await bcrypt.compare(enteredPassword, this.password);
+//   return await bcrypt.compare(enteredPassword, this.password); 
 // };
 
 const Users = model<IUser>("User", UserSchema);
 
 
-
 class UserModel {
+  
   Users = Users
   constructor() {
     // this.Users = Users;
   }
 
-  create = async (userData : IUser ) =>  {
+  create = async (userData : IUserCreate ) => {
     try {
       const newUser = await this.Users.create({
         ...userData,
-      });
-
+      },{ password: 0 });
       return { user: newUser };
     } catch (error) {
       console.log(error);
@@ -75,21 +69,21 @@ class UserModel {
         },
         { password: 0 }, //Don't return password
       );
-      return { updatedUser };
+      return updatedUser;
     } catch (error) {}
   };
 
   findByEmail = async (email: string) => {
     try {
-      const user = await this.Users.find({ email: email }, { password: 0 }); //Don't return password
-      return { user };
+      const user = await this.Users.findOne({ email: email }); //Don't return password
+      return user;
     } catch (error) {}
   }
 
-  getAll = async () => {
+  getAll = async () =>  {
     try {
       const users = await this.Users.find({}, { password: 0 }); //Don't return password
-      return { users };
+      return users;
     } catch (error) {}
   };
 }
