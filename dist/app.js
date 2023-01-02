@@ -7,8 +7,7 @@ const express_1 = __importDefault(require("express"));
 const app = (0, express_1.default)();
 const dotenv_1 = __importDefault(require("dotenv"));
 const body_parser_1 = __importDefault(require("body-parser"));
-const connectDB_1 = __importDefault(require("./database/connectDB"));
-;
+const database_1 = __importDefault(require("./database"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 dotenv_1.default.config();
@@ -27,7 +26,7 @@ app.use(express_1.default.json());
 app.use(express_1.default.static("public"));
 app.use((0, cookie_parser_1.default)());
 // mongoDB connection
-(0, connectDB_1.default)();
+(0, database_1.default)();
 // Load Routers
 app.use("/api/v1", require("./apis/routes/index.routes"));
 exports.default = app;

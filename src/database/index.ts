@@ -1,13 +1,14 @@
 import mongoose from "mongoose";
 
 require("dotenv").config();
-const config = require("../config");
+import config from "../config";
 
 //  remember to replace with appropriate names
-let username : string = config.mongoDb.mongoUser;
-let password : string = config.mongoDb.mongoPass;
+let username = config.mongoDb.mongoUser;
+let password = config.mongoDb.mongoPass;
+let path = config.mongoDb.mongoPath;
 
-const MONGO_URI : string = `mongodb+srv://${username}:${password}@cluster0.tnwwg.mongodb.net/foodie?retryWrites=true&w=majority`;
+const MONGO_URI = `mongodb+srv://${username}:${password}${path}`;
 
 
 const connectDB = async () => {
@@ -24,4 +25,4 @@ const connectDB = async () => {
   }
 };
 
-module.exports = connectDB;
+export default connectDB;
