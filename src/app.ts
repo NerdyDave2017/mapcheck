@@ -6,6 +6,8 @@ import bodyparser from "body-parser";
 import connectDB from "./database";
 import cors from "cors";
 
+import errorMiddleware from "./middlewares/error.middleware";
+
 dotenv.config();
 
 var whitelist = ["*"];
@@ -23,6 +25,8 @@ app.use(bodyparser.json());
 app.use(express.json());
 // app.use(express.urlencoded());
 app.use(express.static("public"));
+
+app.use(errorMiddleware);
 
 // mongoDB connection
 connectDB();

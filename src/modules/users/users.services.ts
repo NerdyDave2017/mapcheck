@@ -3,7 +3,7 @@ import { IUserInput,IChangePassword,IUserSignin, IUserCreate } from "../../inter
 import { matchPassword } from "../../utils/matchPassword";
 
 
-class UserService {
+export default class UserService {
   userModel
   constructor() {
     this.userModel  = new UserModel();
@@ -100,4 +100,4 @@ class UserService {
   };
 }
 
-module.exports = UserService;
+;
