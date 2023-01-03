@@ -46,7 +46,7 @@ class UserModel {
     try {
       const newMarker = await this.Markers.create({
         ...markerData,
-      },{ password: 0 });
+      });
       return newMarker;
     } catch (error) {
       console.log(error);
@@ -56,7 +56,7 @@ class UserModel {
   findById = async (id: string) => {
     try {
       const marker = await this.Markers.findById(id)
-      .populate("user"); //Don't return password
+      .populate("user");
       return marker;
     } catch (error) {
       console.log(error)
@@ -74,7 +74,7 @@ class UserModel {
 
   getAll = async () =>  {
     try {
-      const markers = await this.Markers.find({}, { password: 0 })
+      const markers = await this.Markers.find({})
       .populate("user"); //Don't return password
       return markers;
     } catch (error) {}
