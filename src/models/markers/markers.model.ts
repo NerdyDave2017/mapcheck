@@ -4,7 +4,8 @@ import { IUserInput,IChangePassword,IUserSignin, IUserCreate, IUpdateUser  } fro
 
 export interface IMarker extends Document{
   user: Types.ObjectId;
-  location: ILocation;
+  longitude: number;
+  latitude: number;
   markerType: string;
   description: string;
 }
@@ -17,11 +18,8 @@ interface ILocation {
 const UserSchema   = new Schema<IMarker>(
   {
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    location: {
-      longitute: { type: Number},
-      latitude: { type: Number },
-      required: true 
-    },
+    longitude: { type: Number},
+    latitude: { type: Number},
     markerType: { type: String, required: true  }, // "Speed Camera" | "Police Checkpoint" | "Roadworks" | "Accident" | "Road Damage" | "Other"
     description: { type: String },
   },

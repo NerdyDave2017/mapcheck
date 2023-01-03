@@ -15,8 +15,6 @@ export default class UserService{
   signUp = async (userData: IUserCreate) => {
     try {
       const { email } = userData;
-      console.log(email);
-
       const userExist  = await this.userModel.findByEmail(email);
 
       // console.log(userExist)

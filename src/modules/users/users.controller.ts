@@ -62,7 +62,7 @@ export default class UserController {
 
   fetchAllUsers = async (req:Request, res:Response, next: NextFunction) => {
     try {
-      console.log("controller fetch");
+      
       const users  = await this.userService.fetchAllUser();
       if(!users) {
         throw next(new UserNotFoundException)

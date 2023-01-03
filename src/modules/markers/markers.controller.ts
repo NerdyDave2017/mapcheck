@@ -24,6 +24,7 @@ export default class UserController {
   delete = async (req:Request, res:Response, next: NextFunction) => {
     try {
       const marker  = await this.markerService.delete(req.body);
+      console.log(marker)
       if (!marker) {
         throw next(new HttpException(404, "Marker not found"))
       }
@@ -35,7 +36,7 @@ export default class UserController {
 
   fetchAllMarkers = async (req:Request, res:Response, next: NextFunction) => {
     try {
-      console.log("controller fetch");
+      
       const markers  = await this.markerService.fetchAllMarkers();
       if(!markers) {
         throw next(new HttpException(404, "Markers not found"))
