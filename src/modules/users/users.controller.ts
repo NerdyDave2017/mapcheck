@@ -1,59 +1,61 @@
 import { NextFunction, Request, Response } from 'express';
-import HttpException from '../../exceptions/HttpException';
-import UserModel from "../../models/user/users.model";
+import HttpException from '../../exception/HttpException';
 import UserService from "./users.services";
 
-class UserController {
-  
+export default class UserController {
   userService
   constructor() {
     this.userService = new UserService();
   }
 
-  create = async (req:Request, res:Response) => {
-    console.log(this);
-    console.log(this.userService);
-    console.log(req.body);
+  create = async (req:Request, res:Response, next: NextFunction) => {
+    console.log(req.body)
     try {
-      const { user } = await this.userService.signUp(req.body);
-      return res.status(201).json({ user });
+      const user  = await this.userService.signUp(req.body);
+      
+      if (user){
+        throw next(new HttpException(400, `User Already Exists`))
+      }
+      return res.status(201).json({ status: "success", message: "User Created", user });
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ error });
     }
   };
 
-  signIn = async (req:Request, res:Response) => {
+  signIn = async (req:Request, res:Response, next: NextFunction) => {
     try {
-      const { user } = await this.userService.signIn(req.body);
-      return res.status(200).json({ user });
+      const user  = await this.userService.signIn(req.body);
+      if (!user) {
+        throw next(new HttpException(400, `Invalid Credentials`))
+      }
+      return res.status(200).json({ status:"success", messsage:"User Signin", user });
     } catch (error) {
-      return res.status(400).json({ error });
+      console.log(error);
     }
   };
 
-  updateData = async (req:Request, res:Response) => {
+  updateData = async (req:Request, res:Response, next: NextFunction) => {
     try {
-      const { updatedUser } = await this.userService.updateData(req.body);
+      const updatedUser = await this.userService.updateData(req.body);
       return res.status(200).json({ updatedUser });
     } catch (error) {
       return res.status(400).json({ error });
     }
   };
 
-  updatePassword = async (req:Request, res:Response) => {
+  updatePassword = async (req:Request, res:Response, next: NextFunction) => {
     try {
-      const { updatedUser } = await this.userService.updatePassword(req.body);
+      const updatedUser = await this.userService.updatePassword(req.body);
       return res.status(200).json({ updatedUser });
     } catch (error) {
       return res.status(400).json({ error });
     }
   };
 
-  fetchAllUsers = async (req:Request, res:Response) => {
+  fetchAllUsers = async (req:Request, res:Response, next: NextFunction) => {
     try {
       console.log("controller fetch");
-      const { users } = await this.userService.fetchAllUser();
+      const users  = await this.userService.fetchAllUser();
       return res.status(200).json({ users });
     } catch (error) {
       return res.status(400).json({ error });

@@ -2,7 +2,7 @@ import {Types, Schema, Document, model, Model} from "mongoose";
 import bcrypt from "bcrypt";
 import { IUserInput,IChangePassword,IUserSignin, IUserCreate, IUpdateUser  } from "../../interfaces/user";
 
-interface IUser extends Document{
+export interface IUser extends Document{
   firstname: string;
   lastname: string;
   email: string;
@@ -10,17 +10,13 @@ interface IUser extends Document{
   markers?: Types.ObjectId[];
 }
 
-interface IUserDocument extends IUser{}
-
-
-
 const UserSchema   = new Schema<IUser>(
   {
     firstname: { type: String },
     lastname: {type: String},
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true },
-    markers: [{ type: Schema.Types.ObjectId, ref: "Marker" }],
+    markers: [{ type: Schema.Types.ObjectId, ref: "Markers" }],
   },
   {
     timestamps: true,
@@ -50,11 +46,12 @@ class UserModel {
   }
 
   create = async (userData : IUserCreate ) => {
+    
     try {
       const newUser = await this.Users.create({
         ...userData,
       },{ password: 0 });
-      return { user: newUser };
+      return newUser ;
     } catch (error) {
       console.log(error);
     }
@@ -75,14 +72,18 @@ class UserModel {
 
   findByEmail = async (email: string) => {
     try {
-      const user = await this.Users.findOne({ email: email }); //Don't return password
+      const user = await this.Users.findOne({ email: email })
+      // .populate("markers"); //Don't return password
       return user;
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   getAll = async () =>  {
     try {
-      const users = await this.Users.find({}, { password: 0 }); //Don't return password
+      const users = await this.Users.find({}, { password: 0 })
+      // .populate("markers"); //Don't return password
       return users;
     } catch (error) {}
   };

@@ -1,9 +1,9 @@
 import UserModel from "../../models/user/users.model";
 import { IUserInput,IChangePassword,IUserSignin, IUserCreate } from "../../interfaces/user";
 import { matchPassword } from "../../utils/matchPassword";
+import HttpException from '../../exception/HttpException';
 
-
-export default class UserService {
+export default class UserService{
   userModel
   constructor() {
     this.userModel  = new UserModel();
@@ -16,14 +16,13 @@ export default class UserService {
 
       const userExist  = await this.userModel.findByEmail(email);
 
-      
+      // console.log(userExist)
 
       if (userExist) {
-        throw new Error(`User Already Exists`);
+        return userExist;
       }
 
       const user  = await this.userModel.create(userData);
-
       // Email verification dependency
 
       return user ;
@@ -39,11 +38,11 @@ export default class UserService {
         const validPassword = await matchPassword(password, user.password);
 
         if (!validPassword) {
-          throw new Error(`Invalid credentials`);
+          return false;
         }
-        return  user ;
+        return user ;
       } else {
-        throw new Error(`Invalid credentials`);
+        return false;
       }
     } catch (error) {
       console.log(error);
