@@ -2,72 +2,71 @@ import {Types, Schema, Document, model, Model} from "mongoose";
 import bcrypt from "bcrypt";
 import { IUserInput,IChangePassword,IUserSignin, IUserCreate, IUpdateUser  } from "../../interfaces/user";
 
-export interface IUser extends Document{
+export interface IMarker extends Document{
   user: Types.ObjectId;
+  location: ILocation;
+  markerType: string;
+  description: string;
 }
 
-const UserSchema   = new Schema<IUser>(
+interface ILocation {
+  longitute: number;
+  latitude: number;
+}
+
+const UserSchema   = new Schema<IMarker>(
   {
-    user: { type: Schema.Types.ObjectId, ref: "User" }
+    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    location: {
+      longitute: { type: Number},
+      latitude: { type: Number },
+      required: true 
+    },
+    markerType: { type: String, required: true  }, // "Speed Camera" | "Police Checkpoint" | "Roadworks" | "Accident" | "Road Damage" | "Other"
+    description: { type: String },
   },
   {
     timestamps: true,
   }
 );
 
-UserSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    next();
-  }
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-});
 
-// UserSchema.methods.matchPassword = async function(enteredPassword : string) {
-//   return await bcrypt.compare(enteredPassword, this.password); 
-// };
-
-const Users = model<IUser>("User", UserSchema);
+const Markers = model<IMarker>("Marker", UserSchema);
 
 
 class UserModel {
   
-  Users = Users
+  Markers = Markers
   constructor() {
-    // this.Users = Users;
+    
   }
 
-  create = async (userData : IUserCreate ) => {
+  create = async (markerData : IMarker ) => {
     
     try {
-      const newUser = await this.Users.create({
-        ...userData,
+      const newMarker = await this.Markers.create({
+        ...markerData,
       },{ password: 0 });
-      return newUser ;
+      return newMarker;
     } catch (error) {
       console.log(error);
     }
   };
 
-  update = async (email : string, userData : IUpdateUser) => {
- 
+  findById = async (id: string) => {
     try {
-      const updatedUser = await this.Users.findOneAndUpdate(
-        { email: email },
-        {
-          ...userData,
-        },
-        { new: true}, //Don't return password
-      );
-      return updatedUser;
-    } catch (error) {}
-  };
+      const marker = await this.Markers.findById(id)
+      .populate("user"); //Don't return password
+      return marker;
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
-  findByEmail = async (email: string) => {
+  delete = async (id: string) => {
     try {
-      const user = await this.Users.findOne({ email: email })
-      // .populate("markers"); //Don't return password
-      return user;
+      const marker = await this.Markers.findByIdAndDelete(id)
+      return marker;
     } catch (error) {
       console.log(error)
     }
@@ -75,9 +74,9 @@ class UserModel {
 
   getAll = async () =>  {
     try {
-      const users = await this.Users.find({}, { password: 0 })
-      // .populate("markers"); //Don't return password
-      return users;
+      const markers = await this.Markers.find({}, { password: 0 })
+      .populate("user"); //Don't return password
+      return markers;
     } catch (error) {}
   };
 }
