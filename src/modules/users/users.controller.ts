@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import HttpException from '../../exception/HttpException';
+import UserNotFoundException from '../../exception/UserNotFound';
+import InvalidCredentialsException from '../../exception/InvalidCredentials';
 import UserService from "./users.services";
 
 export default class UserController {
@@ -26,7 +28,7 @@ export default class UserController {
     try {
       const user  = await this.userService.signIn(req.body);
       if (!user) {
-        throw next(new HttpException(400, `Invalid Credentials`))
+        throw next(new UserNotFoundException)
       }
       return res.status(200).json({ status:"success", messsage:"User Signin", user });
     } catch (error) {
@@ -35,30 +37,39 @@ export default class UserController {
   };
 
   updateData = async (req:Request, res:Response, next: NextFunction) => {
+    console.log(req.body)
     try {
-      const updatedUser = await this.userService.updateData(req.body);
-      return res.status(200).json({ updatedUser });
+      const user = await this.userService.updateData(req.body, next);
+      
+      if(!user) {
+        return
+      }
+
+      return res.status(200).json({ status:"success", messsage:"User Updated", user });
     } catch (error) {
-      return res.status(400).json({ error });
+      console.log(error);
     }
   };
 
-  updatePassword = async (req:Request, res:Response, next: NextFunction) => {
-    try {
-      const updatedUser = await this.userService.updatePassword(req.body);
-      return res.status(200).json({ updatedUser });
-    } catch (error) {
-      return res.status(400).json({ error });
-    }
-  };
+  // updatePassword = async (req:Request, res:Response, next: NextFunction) => {
+  //   try {
+  //     const updatedUser = await this.userService.updatePassword(req.body);
+  //     return res.status(200).json({ updatedUser });
+  //   } catch (error) {
+  //     return res.status(400).json({ error });
+  //   }
+  // };
 
   fetchAllUsers = async (req:Request, res:Response, next: NextFunction) => {
     try {
       console.log("controller fetch");
       const users  = await this.userService.fetchAllUser();
-      return res.status(200).json({ users });
+      if(!users) {
+        throw next(new UserNotFoundException)
+      }
+      return res.status(200).json({status:"success", message: "All Users", users });
     } catch (error) {
-      return res.status(400).json({ error });
+      console.log(error)
     }
   };
 }

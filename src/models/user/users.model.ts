@@ -16,7 +16,7 @@ const UserSchema   = new Schema<IUser>(
     lastname: {type: String},
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true },
-    markers: [{ type: Schema.Types.ObjectId, ref: "Markers" }],
+    markers: [{ type: Schema.Types.ObjectId, ref: "Marker"}],
   },
   {
     timestamps: true,
@@ -58,13 +58,14 @@ class UserModel {
   };
 
   update = async (email : string, userData : IUpdateUser) => {
+ 
     try {
       const updatedUser = await this.Users.findOneAndUpdate(
         { email: email },
         {
           ...userData,
         },
-        { password: 0 }, //Don't return password
+        { new: true}, //Don't return password
       );
       return updatedUser;
     } catch (error) {}
@@ -73,7 +74,7 @@ class UserModel {
   findByEmail = async (email: string) => {
     try {
       const user = await this.Users.findOne({ email: email })
-      // .populate("markers"); //Don't return password
+      .populate("markers"); //Don't return password
       return user;
     } catch (error) {
       console.log(error)
@@ -83,7 +84,7 @@ class UserModel {
   getAll = async () =>  {
     try {
       const users = await this.Users.find({}, { password: 0 })
-      // .populate("markers"); //Don't return password
+      .populate("markers"); //Don't return password
       return users;
     } catch (error) {}
   };

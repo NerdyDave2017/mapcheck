@@ -8,6 +8,7 @@ export interface IUserInput {
   lastname?: string;
   email: string;
   password?: string;
+  newPassword?: string;
 }
 
 export interface IUserSignin{

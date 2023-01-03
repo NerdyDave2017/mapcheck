@@ -1,7 +1,10 @@
 import UserModel from "../../models/user/users.model";
+import { NextFunction, Request, Response } from 'express';
 import { IUserInput,IChangePassword,IUserSignin, IUserCreate } from "../../interfaces/user";
 import { matchPassword } from "../../utils/matchPassword";
 import HttpException from '../../exception/HttpException';
+import InvalidCredentialsException from "../../exception/InvalidCredentials";
+import UserNotFoundException from "../../exception/UserNotFound";
 
 export default class UserService{
   userModel
@@ -49,53 +52,64 @@ export default class UserService{
     }
   };
 
-  updateData = async (userData:IUserInput) => {
+  updateData = async (userData:IUserInput, next: NextFunction) => {
     try {
-      const { email, password, ...rest } = userData;
-      if (password) {
-        throw new Error(`Password cannot be updated`);
-      }
+      const { email, password, newPassword, ...rest} = userData;
 
       const user = await this.userModel.findByEmail(email);
 
       if (!user) {
-        throw new Error(`User does not exist`);
+        throw next(new UserNotFoundException)
       }
 
-      const updatedUser  = await this.userModel.update(email, { ...rest });
+      if (password) {
+        /* A function that compares the password entered by the user with the password in the database. */
+        const validPassword = await matchPassword(password, user.password);
 
-      return { updatedUser };
-    } catch (error) {}
+        if (!validPassword) {
+          throw next(new InvalidCredentialsException)
+        }
+        const updatedUser  = await this.userModel.update(email, { password: newPassword, ...rest });
+
+        return updatedUser;
+      }
+
+      const updatedUser  = await this.userModel.update(email, {...rest });
+
+      return updatedUser;
+    } catch (error) {
+      console.log(error)
+    }
   };
 
-  updatePassword = async (userData:IChangePassword) => {
-    const { email, password, newPassword } = userData;
-    try {
-      const user  = await this.userModel.findByEmail(email);
+  // updatePassword = async (userData:IChangePassword) => {
+  //   const { email, password, newPassword } = userData;
+  //   try {
+  //     const user  = await this.userModel.findByEmail(email);
 
-      if (!user) {
-        throw new Error(`User does not exist`);
-      }
+  //     if (!user) {
+  //       throw new Error(`User does not exist`);
+  //     }
 
 
-      /* A function that compares the password entered by the user with the password in the database. */
-      const validPassword = await matchPassword(password, user.password);
+  //     /* A function that compares the password entered by the user with the password in the database. */
+  //     const validPassword = await matchPassword(password, user.password);
 
-      if (!validPassword) {
-        throw new Error(`Invalid credentials`);
-      }
+  //     if (!validPassword) {
+  //       throw new Error(`Invalid credentials`);
+  //     }
 
-      const updatedUser  = await this.userModel.update(email, {
-        password: newPassword,
-      });
+  //     const updatedUser  = await this.userModel.update(email, {
+  //       password: newPassword,
+  //     });
 
-      return { updatedUser };
-    } catch (error) {}
-  };
+  //     return { updatedUser };
+  //   } catch (error) {}
+  // };
 
   fetchAllUser = async () => {
     const users  = await this.userModel.getAll();
-    return { users };
+    return users;
   };
 }
 
