@@ -2,7 +2,8 @@ import {Types, Schema, Document, model, Model} from "mongoose";
 import bcrypt from "bcrypt";
 import { IUserInput,IChangePassword,IUserSignin, IUserCreate, IUpdateUser  } from "../../interfaces/user";
 
-export interface IUser extends Document{
+export interface IUser{
+  id: string,
   firstname: string;
   lastname: string;
   email: string;

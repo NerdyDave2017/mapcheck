@@ -1,8 +1,22 @@
-import { NextFunction, Request, Response } from 'express';
+import { CookieOptions,NextFunction, Request, Response } from 'express';
 import HttpException from '../../exception/HttpException';
 import UserNotFoundException from '../../exception/UserNotFound';
 import InvalidCredentialsException from '../../exception/InvalidCredentials';
 import UserService from "./users.services";
+import config from "../../config";
+
+const expiresIn = Number(config.jwt.accessTokenExpiresIn) || 60 * 60 * 24 * 7;
+// Cookie options
+const accessTokenCookieOptions: CookieOptions = {
+  expires: new Date(Date.now() + expiresIn * 60 * 1000),
+  maxAge: expiresIn * 60 * 1000,
+  httpOnly: true,
+  sameSite: 'lax',
+};
+
+// Only set secure to true in production
+if (process.env.NODE_ENV === 'production')
+  accessTokenCookieOptions.secure = true;
 
 export default class UserController {
   userService
@@ -13,11 +27,24 @@ export default class UserController {
   create = async (req:Request, res:Response, next: NextFunction) => {
     console.log(req.body)
     try {
-      const user  = await this.userService.signUp(req.body);
+      const user  = await this.userService.signUp(req.body, next);
       
-      if (user){
-        throw next(new HttpException(400, `User Already Exists`))
-      }
+      // if (){
+      //   throw next(new HttpException(400, `User Already Exists`))
+      // }
+
+
+      // Create an Access Token
+      // @ts-ignore
+      const { accessToken } = await signToken(user?._id);
+
+      // Send Access Token in Cookie
+      res.cookie('accessToken', accessToken, accessTokenCookieOptions);
+      res.cookie('logged_in', true, {
+        ...accessTokenCookieOptions,
+        httpOnly: false,
+      });
+
       return res.status(201).json({ status: "success", message: "User Created", user });
     } catch (error) {
       console.log(error);
@@ -74,4 +101,10 @@ export default class UserController {
   };
 }
 
+
+
 module.exports = UserController;
+function signToken(user: undefined): { accessToken: any; } | PromiseLike<{ accessToken: any; }> {
+  throw new Error('Function not implemented.');
+}
+

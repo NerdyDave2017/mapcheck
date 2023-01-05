@@ -1,6 +1,9 @@
 export interface IUserCreate{
   email: string;
+  firstname: string;
+  lastname: string;
   password: string;
+  newPassword: string;
 }
 
 export interface IUserInput {

@@ -19,5 +19,6 @@ export default {
   jwt:{
     accessTokenPrivateKey: process.env.ACCESS_TOKEN_PRIVATE_KEY,
     accessTokenPublicKey: process.env.ACCESS_TOKEN_PUBLIC_KEY,
+    accessTokenExpiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
   }
 };
