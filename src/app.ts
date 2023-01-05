@@ -12,7 +12,9 @@ import routes from "./apis/routes/index.routes"
 
 dotenv.config();
 
-var whitelist = ["http://localhost:3000", "http://localhost:3001"];
+import config from "./config";
+
+var whitelist = [config.urls.client_dev, "http://localhost:3001", config.urls.client_prod];
 var corsOptions = {
   origin: whitelist,
   credentials: true,

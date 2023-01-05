@@ -11,4 +11,9 @@ export default {
     mongoUser: process.env.MONGO_USER,
     mongoPath: process.env.MONGO_PATH,
   },
+  urls:{
+    client_dev: process.env.CLIENT_URL_DEV,
+    client_prod: process.env.CLIENT_URL_PROD,
+    server: process.env.SERVER_URL
+  }
 };
