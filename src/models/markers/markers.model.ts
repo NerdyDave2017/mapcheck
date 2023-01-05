@@ -40,7 +40,6 @@ class UserModel {
   }
 
   create = async (markerData : IMarker ) => {
-    
     try {
       const newMarker = await this.Markers.create({
         ...markerData,
@@ -73,7 +72,7 @@ class UserModel {
   getAll = async () =>  {
     try {
       const markers = await this.Markers.find({})
-      .populate("user"); //Don't return password
+      .populate("user"); 
       return markers;
     } catch (error) {}
   };

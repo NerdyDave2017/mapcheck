@@ -5,14 +5,14 @@ import bodyparser from "body-parser";
 
 import connectDB from "./database";
 import cors from "cors";
-
+import cookieParser from "cookie-parser";
 import errorMiddleware from "./apis/middlewares/error.middleware";
 
 import routes from "./apis/routes/index.routes"
 
 dotenv.config();
 
-var whitelist = ["*"];
+var whitelist = ["http://localhost:3000", "http://localhost:3001"];
 var corsOptions = {
   origin: whitelist,
   credentials: true,
@@ -27,6 +27,7 @@ app.use(bodyparser.json());
 app.use(express.json());
 // app.use(express.urlencoded());
 app.use(express.static("public"));
+app.use(cookieParser());
 
 
 
