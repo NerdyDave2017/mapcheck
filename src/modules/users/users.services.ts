@@ -96,17 +96,18 @@ export default class UserService {
 
   findUser = async (userData: IUserInput) => {
     try {
+      const { email } = userData;
+      console.log(email);
+      const user = await this.userModel.findByEmail(email);
+      console.log(user);
+      if (!user) {
+        return false;
+      }
+
+      return user;
     } catch (err) {
-      console.log;
+      console.log(err);
     }
-    const { email } = userData;
-    const user = await this.userModel.findByEmail(email);
-
-    if (!user) {
-      return false;
-    }
-
-    return user;
   };
 
   signToken = async (email: string) => {

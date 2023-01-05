@@ -55,7 +55,7 @@ export default class UserController {
 
       const data = {
         user: user,
-        access_token: access_token,
+        accessToken: access_token,
         expiresAt: expiresAt,
         loggedIn: true,
         userId: userId,
@@ -96,7 +96,7 @@ export default class UserController {
 
       const data = {
         user: user,
-        access_token: access_token,
+        accessToken: access_token,
         expiresAt: expiresAt,
         loggedIn: true,
         userId: userId,
@@ -128,6 +128,7 @@ export default class UserController {
   };
 
   findUser = async (req: Request, res: Response, next: NextFunction) => {
+    console.log(req.body);
     try {
       const user = await this.userService.findUser(req.body);
       if (!user) {
