@@ -13,7 +13,6 @@ const MONGO_URI = `mongodb+srv://${username}:${password}${path}`;
 
 const connectDB = async () => {
   try {
-    console.log(MONGO_URI)
     // mongodb connection string
     const con = await mongoose.connect(MONGO_URI);
 

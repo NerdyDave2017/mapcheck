@@ -1,9 +1,9 @@
-export interface IUserCreate{
+export interface IUserCreate {
   email: string;
   firstname: string;
   lastname: string;
   password: string;
-  newPassword: string;
+  // newPassword: string;
 }
 
 export interface IUserInput {
@@ -14,18 +14,18 @@ export interface IUserInput {
   newPassword?: string;
 }
 
-export interface IUserSignin{
+export interface IUserSignin {
   email: string;
   password: string;
 }
 
-export interface IUpdateUser{
+export interface IUpdateUser {
   firstname?: string;
   lastname?: string;
   password?: string;
 }
 
-export interface IChangePassword{
+export interface IChangePassword {
   email: string;
   password: string;
   newPassword: string;

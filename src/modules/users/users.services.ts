@@ -1,40 +1,48 @@
 import UserModel from "../../models/user/users.model";
-import { NextFunction, Request, Response } from 'express';
-import { IUserInput,IChangePassword,IUserSignin, IUserCreate } from "../../interfaces/user";
+import { NextFunction, Request, Response } from "express";
+import {
+  IUserInput,
+  IChangePassword,
+  IUserSignin,
+  IUserCreate,
+} from "../../interfaces/user";
 import { matchPassword } from "../../utils/matchPassword";
-import HttpException from '../../exception/HttpException';
+import HttpException from "../../exception/HttpException";
 import InvalidCredentialsException from "../../exception/InvalidCredentials";
 import UserNotFoundException from "../../exception/UserNotFound";
 import { signJwt } from "../../utils/jwt";
 import config from "../../config";
-import { IUser } from '../../models/user/users.model';
+import { IUser } from "../../models/user/users.model";
 
-export default class UserService{
-  userModel
+export default class UserService {
+  userModel;
   constructor() {
-    this.userModel  = new UserModel();
+    this.userModel = new UserModel();
   }
 
   signUp = async (userData: IUserCreate, next: NextFunction) => {
     try {
       const { email } = userData;
-      const userExist  = await this.userModel.findByEmail(email);
+      const userExist = await this.userModel.findByEmail(email);
 
       // console.log(userExist)
 
+      console.log(userExist);
+
       if (userExist) {
-        throw next(new HttpException(400, `User Already Exists`))
+        return false;
       }
 
-      const user  = await this.userModel.create(userData);
+      const user = await this.userModel.create(userData);
       // Email verification dependency
-
-      return user ;
+      //@ts-ignore
+      return user;
     } catch (error) {}
   };
 
   signIn = async (userData: IUserSignin) => {
-    const { email, password } = userData
+    const { email, password } = userData;
+    console.log(email, password);
     try {
       const user = await this.userModel.findByEmail(email);
 
@@ -44,7 +52,7 @@ export default class UserService{
         if (!validPassword) {
           return false;
         }
-        return user ;
+        return user;
       } else {
         return false;
       }
@@ -53,14 +61,14 @@ export default class UserService{
     }
   };
 
-  updateData = async (userData:IUserInput, next: NextFunction) => {
+  updateData = async (userData: IUserInput, next: NextFunction) => {
     try {
-      const { email, password, newPassword, ...rest} = userData;
+      const { email, password, newPassword, ...rest } = userData;
 
       const user = await this.userModel.findByEmail(email);
 
       if (!user) {
-        throw next(new UserNotFoundException)
+        throw next(new UserNotFoundException());
       }
 
       if (password) {
@@ -68,32 +76,53 @@ export default class UserService{
         const validPassword = await matchPassword(password, user.password);
 
         if (!validPassword) {
-          throw next(new InvalidCredentialsException)
+          throw next(new InvalidCredentialsException());
         }
-        const updatedUser  = await this.userModel.update(email, { password: newPassword, ...rest });
+        const updatedUser = await this.userModel.update(email, {
+          password: newPassword,
+          ...rest,
+        });
 
         return updatedUser;
       }
 
-      const updatedUser  = await this.userModel.update(email, {...rest });
+      const updatedUser = await this.userModel.update(email, { ...rest });
 
       return updatedUser;
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
 
-  signToken = async (id:string) => {
+  findUser = async (userData: IUserInput) => {
+    try {
+    } catch (err) {
+      console.log;
+    }
+    const { email } = userData;
+    const user = await this.userModel.findByEmail(email);
+
+    if (!user) {
+      return false;
+    }
+
+    return user;
+  };
+
+  signToken = async (email: string) => {
+    console.log(email);
     // Sign the access token
     const access_token = signJwt(
-      { sub: id },
+      { sub: email },
       {
         expiresIn: `${config.jwt.accessTokenExpiresIn}m`,
       }
     );
 
+    console.log("access", access_token);
+
     // Return access token
-    return { access_token };
+    return access_token;
   };
 
   // updatePassword = async (userData:IChangePassword) => {
@@ -104,7 +133,6 @@ export default class UserService{
   //     if (!user) {
   //       throw new Error(`User does not exist`);
   //     }
-
 
   //     /* A function that compares the password entered by the user with the password in the database. */
   //     const validPassword = await matchPassword(password, user.password);
@@ -122,9 +150,7 @@ export default class UserService{
   // };
 
   fetchAllUser = async () => {
-    const users  = await this.userModel.getAll();
+    const users = await this.userModel.getAll();
     return users;
   };
 }
-
-;

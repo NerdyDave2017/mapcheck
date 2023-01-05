@@ -1,9 +1,14 @@
-import {Types, Schema, Document, model, Model} from "mongoose";
+import { Types, Schema, Document, model, Model } from "mongoose";
 import bcrypt from "bcrypt";
-import { IUserInput,IChangePassword,IUserSignin, IUserCreate, IUpdateUser  } from "../../interfaces/user";
+import {
+  IUserInput,
+  IChangePassword,
+  IUserSignin,
+  IUserCreate,
+  IUpdateUser,
+} from "../../interfaces/user";
 
-export interface IUser{
-  id: string,
+export interface IUser extends Document {
   firstname: string;
   lastname: string;
   email: string;
@@ -11,13 +16,13 @@ export interface IUser{
   markers?: Types.ObjectId[];
 }
 
-const UserSchema   = new Schema<IUser>(
+const UserSchema = new Schema<IUser>(
   {
     firstname: { type: String },
-    lastname: {type: String},
+    lastname: { type: String },
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true },
-    markers: [{ type: Schema.Types.ObjectId, ref: "Marker"}],
+    markers: [{ type: Schema.Types.ObjectId, ref: "Marker" }],
   },
   {
     timestamps: true,
@@ -33,40 +38,41 @@ UserSchema.pre("save", async function (next) {
 });
 
 // UserSchema.methods.matchPassword = async function(enteredPassword : string) {
-//   return await bcrypt.compare(enteredPassword, this.password); 
+//   return await bcrypt.compare(enteredPassword, this.password);
 // };
 
 const Users = model<IUser>("User", UserSchema);
 
-
 class UserModel {
-  
-  Users = Users
+  Users = Users;
   constructor() {
     // this.Users = Users;
   }
 
-  create = async (userData : IUserCreate ) => {
-    
+  create = async (userData: IUserCreate) => {
+    console.log(userData);
+
     try {
-      const newUser = await this.Users.create({
-        ...userData,
-      },{ password: 0 });
-      return newUser ;
+      const newUser = await this.Users.create(
+        {
+          ...userData,
+        },
+        { password: 0 }
+      );
+      return newUser;
     } catch (error) {
       console.log(error);
     }
   };
 
-  update = async (email : string, userData : IUpdateUser) => {
- 
+  update = async (email: string, userData: IUpdateUser) => {
     try {
       const updatedUser = await this.Users.findOneAndUpdate(
         { email: email },
         {
           ...userData,
         },
-        { new: true}, //Don't return password
+        { new: true } //Don't return password
       );
       return updatedUser;
     } catch (error) {}
@@ -74,18 +80,21 @@ class UserModel {
 
   findByEmail = async (email: string) => {
     try {
-      const user = await this.Users.findOne({ email: email })
-      .populate("markers"); //Don't return password
+      const user = await this.Users.findOne({ email: email }).populate(
+        "markers"
+      ); //Don't return password
+
       return user;
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
-  getAll = async () =>  {
+  getAll = async () => {
     try {
-      const users = await this.Users.find({}, { password: 0 })
-      .populate("markers"); //Don't return password
+      const users = await this.Users.find({}, { password: 0 }).populate(
+        "markers"
+      ); //Don't return password
       return users;
     } catch (error) {}
   };
