@@ -15,5 +15,9 @@ export default {
     client_dev: process.env.CLIENT_URL_DEV,
     client_prod: process.env.CLIENT_URL_PROD,
     server: process.env.SERVER_URL
+  },
+  jwt:{
+    accessTokenPrivateKey: process.env.ACCESS_TOKEN_PRIVATE_KEY,
+    accessTokenPublicKey: process.env.ACCESS_TOKEN_PUBLIC_KEY,
   }
 };
