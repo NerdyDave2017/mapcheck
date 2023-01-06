@@ -8,7 +8,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import errorMiddleware from "./apis/middlewares/error.middleware";
 
-import routes from "./apis/routes/index.routes"
+import routes from "./apis/routes/index.routes";
 
 dotenv.config();
 
@@ -32,16 +32,14 @@ app.use(express.json());
 app.use(express.static("public"));
 app.use(cookieParser());
 
-
-
 // mongoDB connection
 connectDB();
 
-app.get('/', (request, response) => {
-  response.send('Hello world!');
+app.get("/", (request, response) => {
+  response.send("Hello world!");
 });
 // Load Routers
-app.use("/api/v1", routes)
+app.use("/api/v1", routes);
 
 app.use(errorMiddleware);
 

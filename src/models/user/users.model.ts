@@ -18,8 +18,8 @@ export interface IUser extends Document {
 
 const UserSchema = new Schema<IUser>(
   {
-    firstname: { type: String },
-    lastname: { type: String },
+    firstname: { type: String, required: true },
+    lastname: { type: String, required: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true },
     markers: [{ type: Schema.Types.ObjectId, ref: "Marker" }],
@@ -53,12 +53,12 @@ class UserModel {
     console.log(userData);
 
     try {
-      const newUser = await this.Users.create(
-        {
-          ...userData,
-        },
-        { password: 0 }
-      );
+      const newUser = await this.Users.create({
+        firstname: userData.firstname,
+        lastname: userData.lastname,
+        email: userData.email,
+        password: userData.password,
+      });
       return newUser;
     } catch (error) {
       console.log(error);

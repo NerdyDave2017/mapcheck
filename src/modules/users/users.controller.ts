@@ -28,33 +28,24 @@ export default class UserController {
     console.log(req.body);
     try {
       //@ts-ignore
-      const user = await this.userService.signUp(req.body, next);
-      console.log(user);
-      if (!user) {
+      const user = await this.userService.findUser(req.body, next);
+
+      if (user) {
         throw next(new HttpException(401, `User Already Exists`));
       }
+
+      const newUser = await this.userService.createNewUser(req.body);
 
       console.log("we still got here");
       // Create an Access Token
       // @ts-ignore
-      const access_token = await this.userService.signToken(user?.email);
+      const access_token = await this.userService.signToken(newUser?.email);
       const expiresAt = new Date(Date.now() + expiresIn * 60 * 1000);
       //@ts-ignore
-      const userId = user.email;
-      // Send Access Token in Cookie
-      // res.cookie("accessToken", access_token, accessTokenCookieOptions);
-      // res.cookie(
-      //   "expiresAt",
-      //   expiresAt.toISOString(),
-      //   accessTokenCookieOptions
-      // );
-      // res.cookie("logged_in", true, {
-      //   ...accessTokenCookieOptions,
-      //   httpOnly: false,
-      // });
+      const userId = newUser.email;
 
       const data = {
-        user: user,
+        user: newUser,
         accessToken: access_token,
         expiresAt: expiresAt,
         loggedIn: true,

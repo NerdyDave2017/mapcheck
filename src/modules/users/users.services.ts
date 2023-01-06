@@ -20,24 +20,16 @@ export default class UserService {
     this.userModel = new UserModel();
   }
 
-  signUp = async (userData: IUserCreate, next: NextFunction) => {
+  createNewUser = async (userData: IUserCreate) => {
+    console.log("user service", userData);
     try {
-      const { email } = userData;
-      const userExist = await this.userModel.findByEmail(email);
-
-      // console.log(userExist)
-
-      console.log(userExist);
-
-      if (userExist) {
-        return false;
-      }
-
       const user = await this.userModel.create(userData);
       // Email verification dependency
       //@ts-ignore
       return user;
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   signIn = async (userData: IUserSignin) => {
@@ -97,12 +89,8 @@ export default class UserService {
   findUser = async (userData: IUserInput) => {
     try {
       const { email } = userData;
-      console.log(email);
+
       const user = await this.userModel.findByEmail(email);
-      console.log(user);
-      if (!user) {
-        return false;
-      }
 
       return user;
     } catch (err) {
